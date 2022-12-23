@@ -4,11 +4,18 @@ use std::cmp::Ordering::{Equal, Less, Greater};
 use std::str::FromStr;
 use itertools::Itertools;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 enum Move {
     Rock = 1,
     Paper = 2,
     Scissor = 3
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+enum Outcome {
+    Win = 6,
+    Draw = 3,
+    Loss = 0
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -32,20 +39,20 @@ impl FromStr for Move {
             _ => Err(ParseRPSError)
         }
     }
-
-
 }
 
-impl std::cmp::PartialEq for Move {
-    fn eq(&self, other: &Self) -> bool {
-        core::mem::discriminant(self) == core::mem::discriminant(other)
-    }
+impl FromStr for Outcome {
+    type Err = ParseRPSError;
 
-    fn ne(&self, other: &Self) -> bool {
-        !self.eq(other)
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.trim() {
+            "X" => Ok(Outcome::Loss),
+            "Y" => Ok(Outcome::Draw),
+            "Z" => Ok(Outcome::Win),
+            _ => Err(ParseRPSError)
+        }
     }
 }
-
 
 impl std::cmp::PartialOrd for Move {
     fn lt(&self, other: &Self) -> bool {
@@ -91,6 +98,25 @@ impl std::cmp::PartialOrd for Move {
     }
 }
 
+impl Move {
+    pub fn get_outcome(&self, outcome: &Outcome) -> Option<Move> {
+        let mut outcome_mv = None;
+        for mv in [Move::Paper, Move::Rock, Move::Scissor] {
+            let res = if self > &mv {
+                Outcome::Win
+            } else if self == &mv {
+                Outcome::Draw
+            } else {
+                Outcome::Loss
+            };
+            if outcome == &res {
+                outcome_mv = Some(mv);
+                break;
+            }
+        }
+        outcome_mv
+    }
+}
 
 pub fn rps(fname: &str) -> Result<usize, Box<dyn Error>> {
     let prompt = fs::read_to_string(fname)?;
@@ -114,6 +140,37 @@ pub fn rps(fname: &str) -> Result<usize, Box<dyn Error>> {
             // Add score of move
             your_score += your_move as usize;
 
+        }
+    }
+    Ok(your_score)
+}
+
+pub fn rps_2(fname: &str) -> Result<usize, Box<dyn Error>> {
+    let prompt = fs::read_to_string(fname)?;
+
+    // Init score.
+    let mut your_score: usize =  0;
+
+    for res in prompt.trim().split("\n") {
+        let game_instr = res.split(" ").collect_vec();
+        // A - 1, B - 2, C - 3
+        // X - 6, Y - 3, Z - 0
+        if let (Some(exp), Some(resp)) = (game_instr.get(0), game_instr.get(1)) {
+            let opp_move = Move::from_str(exp)?;
+            let opp_outcome = Outcome::from_str(resp)?;
+            let your_outcome = match &opp_outcome {
+                Outcome::Win => Outcome::Loss,
+                Outcome::Draw => Outcome::Draw,
+                Outcome::Loss => Outcome::Win,
+            };
+            let des_move = opp_move.get_outcome(&your_outcome).expect("No move to give desired outcome.");
+            let score_move = des_move as usize;
+            let score_outcome = opp_outcome as usize;
+            println!("{exp} - {resp}");
+            println!("{:?}, {:?}, {:?}, {:?}", opp_move, des_move, score_move, score_outcome);
+            
+            // Add score of move and outcome
+            your_score += score_move + score_outcome;
         }
     }
     Ok(your_score)
