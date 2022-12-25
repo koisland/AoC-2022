@@ -56,3 +56,22 @@ pub fn rucksack(fname: &str) -> Result<usize, Box<dyn Error>> {
 
     Ok(all_priorities.iter().sum())
 }
+
+pub fn elf_groups(fname: &str) -> Result<usize, Box<dyn Error>> {
+    let contents = fs::read_to_string(fname)?;
+    let alphabet = build_priorities();
+    let mut all_priorities: Vec<usize> = vec![];
+
+    for group in &contents.trim().split("\n").chunks(3) {
+        let shared_sack_contents = group
+            .into_iter()
+            .map(|sack| sack.trim().chars().collect::<HashSet<char>>())
+            .reduce(|acc, cnt| acc.intersection(&cnt).cloned().collect());
+        if let Some(shared_items) = shared_sack_contents {
+            if let Some(first_elem) = shared_items.iter().next() {
+                all_priorities.push(*alphabet.get(first_elem).unwrap_or(&0));
+            }
+        }   
+    }
+    Ok(all_priorities.iter().sum())
+}
