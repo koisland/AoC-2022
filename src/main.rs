@@ -21,7 +21,7 @@ fn main() {
     // let res = day4::camp_cleanup_overlap(fname);
     // let res = day5::crate_mover_9001(fname);
     // let res = day6::read_comm_message(fname);
-    let res = day7::sum_file_system(fname);
+    let res = day7::free_space_file_system(fname);
 
     if let Ok(out) = res {
         println!("{:#?}", out)
