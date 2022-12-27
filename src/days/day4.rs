@@ -1,4 +1,4 @@
-use std::{fs, error::Error, ops::RangeInclusive, collections::HashSet};
+use std::{collections::HashSet, error::Error, fs, ops::RangeInclusive};
 
 use itertools::Itertools;
 
@@ -20,15 +20,13 @@ impl ToRange for Vec<usize> {
 
 /// Convert string of format `#-#` to a full set of `#`'s.
 fn range_to_hashset(rng_str: &str) -> Result<HashSet<usize>, Box<dyn Error>> {
-    Ok(
-        rng_str
+    Ok(rng_str
         .trim()
         .split("-")
         .map(|val| val.parse::<usize>().unwrap())
         .collect_vec()
         .to_range()?
-        .collect()
-    )
+        .collect())
 }
 
 pub fn camp_cleanup_duplicates(fname: &str) -> Result<usize, Box<dyn Error>> {

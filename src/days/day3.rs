@@ -1,13 +1,17 @@
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::fs;
-use itertools::Itertools;
 
 fn build_priorities() -> HashMap<char, usize> {
     let low_alpha = (b'a'..=b'z')
         .filter_map(|c| {
             let c = c as char;
-            if c.is_alphabetic() { Some(c) } else { None }
+            if c.is_alphabetic() {
+                Some(c)
+            } else {
+                None
+            }
         })
         .enumerate()
         .map(|(i, chr)| (chr, i + 1))
@@ -16,10 +20,14 @@ fn build_priorities() -> HashMap<char, usize> {
     let mut alphabet = (b'A'..=b'Z')
         .filter_map(|c| {
             let c = c as char;
-            if c.is_alphabetic() { Some(c) } else { None }
-        })     
+            if c.is_alphabetic() {
+                Some(c)
+            } else {
+                None
+            }
+        })
         .enumerate()
-        .map(|(i, chr)| (chr, i + 27))     
+        .map(|(i, chr)| (chr, i + 27))
         .collect::<HashMap<char, usize>>();
 
     // Join two alphabets
@@ -43,8 +51,10 @@ pub fn rucksack(fname: &str) -> Result<usize, Box<dyn Error>> {
 
         let first_comp_item_cnts: HashSet<char> = first_comp.chars().collect();
         let second_comp_item_cnts: HashSet<char> = second_comp.chars().collect();
-        let shared_items = first_comp_item_cnts.intersection(&second_comp_item_cnts).collect_vec();
-        
+        let shared_items = first_comp_item_cnts
+            .intersection(&second_comp_item_cnts)
+            .collect_vec();
+
         if let Some(shared_item) = shared_items.get(0) {
             let priority = alphabet.get(&shared_item).unwrap_or(&0);
             // println!("{:?} - {}", shared_item, priority);
@@ -71,7 +81,7 @@ pub fn elf_groups(fname: &str) -> Result<usize, Box<dyn Error>> {
             if let Some(first_elem) = shared_items.iter().next() {
                 all_priorities.push(*alphabet.get(first_elem).unwrap_or(&0));
             }
-        }   
+        }
     }
     Ok(all_priorities.iter().sum())
 }
