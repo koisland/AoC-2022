@@ -9,7 +9,9 @@ mod days;
 // use crate::days::day4;
 // use crate::days::day5;
 // use crate::days::day6;
-use crate::days::day7;
+// use crate::days::day7;
+// use crate::days::day8;
+use crate::days::day9;
 
 fn main() {
     let args = env::args().collect_vec();
@@ -21,8 +23,9 @@ fn main() {
     // let res = day4::camp_cleanup_overlap(fname);
     // let res = day5::crate_mover_9001(fname);
     // let res = day6::read_comm_message(fname);
-    let res = day7::free_space_file_system(fname);
-
+    // let res = day7::free_space_file_system(fname);
+    // let res = day8::tree_scenic_scores(fname);
+    let res = day9::template(fname);
     if let Ok(out) = res {
         println!("{:#?}", out)
     } else {

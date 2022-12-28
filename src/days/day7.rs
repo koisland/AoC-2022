@@ -1,9 +1,9 @@
 use std::{
     cell::RefCell,
+    collections::HashMap,
     error::Error,
     fs,
     rc::{Rc, Weak},
-    collections::HashMap,
 };
 
 use itertools::Itertools;
@@ -36,7 +36,6 @@ impl std::fmt::Display for FileSystemError {
     }
 }
 impl Error for FileSystemError {}
-
 
 impl Dir {
     fn du(&self) -> usize {
@@ -82,9 +81,14 @@ impl FileSystem {
                     } else {
                         if let Ok(mut current_dir) = curr_dir.try_borrow_mut() {
                             if let Some(cdir) = &*current_dir {
-                                let next_dir = cdir.children.borrow().iter().find(|dir| dir.name == name).cloned();
+                                let next_dir = cdir
+                                    .children
+                                    .borrow()
+                                    .iter()
+                                    .find(|dir| dir.name == name)
+                                    .cloned();
                                 *current_dir = next_dir
-                            } 
+                            }
                         } else {
                             println!("Can't get current.")
                         }
@@ -141,7 +145,8 @@ pub fn sum_file_system(fname: &str) -> Result<usize, Box<dyn Error>> {
 
     // Iterate through all dirs and calculate directory size.
     // du() calculates disk size for current directory and nested directories.
-    let dir_sizes: HashMap<String, usize> = file_system.dirs
+    let dir_sizes: HashMap<String, usize> = file_system
+        .dirs
         .iter()
         .enumerate()
         .filter_map(|(i, dir)| {
@@ -167,11 +172,12 @@ pub fn sum_file_system(fname: &str) -> Result<usize, Box<dyn Error>> {
 pub fn free_space_file_system(fname: &str) -> Result<usize, Box<dyn Error>> {
     let file_system = FileSystem::new(fname)?;
     const DISK_SIZE: usize = 70_000_000;
-    const REQ_DISK_SPACE: usize =  30_000_000;
+    const REQ_DISK_SPACE: usize = 30_000_000;
 
     // Iterate through all dirs and calculate directory size.
     // du() calculates disk size for current directory and nested directories.
-    let dir_sizes: Vec<(String, usize)> = file_system.dirs
+    let dir_sizes: Vec<(String, usize)> = file_system
+        .dirs
         .iter()
         .enumerate()
         .filter_map(|(i, dir)| {
@@ -179,7 +185,7 @@ pub fn free_space_file_system(fname: &str) -> Result<usize, Box<dyn Error>> {
             let new_dirname = format!("{i}_{}", dir.name);
             Some((new_dirname, dir_size))
         })
-        .sorted_by(|(_, size_a), (_, size_b)| Ord::cmp(size_a, &size_b) )
+        .sorted_by(|(_, size_a), (_, size_b)| Ord::cmp(size_a, &size_b))
         .collect();
 
     // Final dir is root dir.
