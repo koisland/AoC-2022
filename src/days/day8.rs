@@ -108,15 +108,25 @@ pub fn tree_top_visibility(fname: &str) -> Result<usize, Box<dyn Error>> {
                 // Split tree along axis at compared tree idx.
                 let l_r_trees_cols = tree_col_heights.split_at(coords.0);
                 let l_r_trees_rows = tree_row_heights.split_at(coords.1);
-                
+
                 // Find max tree height within split axis.
-                let l_r_trees_cols_max = [l_r_trees_cols.0.iter().max().unwrap(), l_r_trees_cols.1.iter().max().unwrap()];
-                let l_r_trees_rows_max = [l_r_trees_rows.0.iter().max().unwrap(), l_r_trees_rows.1.iter().max().unwrap()];
-                
+                let l_r_trees_cols_max = [
+                    l_r_trees_cols.0.iter().max().unwrap(),
+                    l_r_trees_cols.1.iter().max().unwrap(),
+                ];
+                let l_r_trees_rows_max = [
+                    l_r_trees_rows.0.iter().max().unwrap(),
+                    l_r_trees_rows.1.iter().max().unwrap(),
+                ];
+
                 // Find any tree where along split axis, any tree is shorter than it.
-                if [l_r_trees_cols_max, l_r_trees_rows_max].concat().iter().any(|tree| **tree < tree_height) {
+                if [l_r_trees_cols_max, l_r_trees_rows_max]
+                    .concat()
+                    .iter()
+                    .any(|tree| **tree < tree_height)
+                {
                     // println!("{tree_height} {:?} - col {:?} row {:?}", coords, l_r_trees_cols_max, l_r_trees_rows_max);
-                    visible_trees += 1; 
+                    visible_trees += 1;
                 }
             }
         }
@@ -172,7 +182,7 @@ pub fn tree_scenic_scores(fname: &str) -> Result<usize, Box<dyn Error>> {
             // Split tree along axis at compared tree idx.
             let (l_tree_cols, r_tree_cols) = tree_col_heights.split_at(coords.0);
             let (l_tree_rows, r_tree_rows) = tree_row_heights.split_at(coords.1);
-            
+
             // TODO: Unnecessary clone. Can do calculate and assign to 4 vars.
             // Reverse direction and order trees come in respective to compared tree.
             let u_trees_cols = l_tree_cols.iter().rev().cloned().collect_vec();
@@ -180,9 +190,7 @@ pub fn tree_scenic_scores(fname: &str) -> Result<usize, Box<dyn Error>> {
 
             let tree_views = [&u_trees_cols, r_tree_cols, &l_tree_rows, r_tree_rows]
                 .iter()
-                .map(|adj_trees| 
-                    tree_view_dst(tree_height, &adj_trees)
-                )
+                .map(|adj_trees| tree_view_dst(tree_height, &adj_trees))
                 .collect_vec();
 
             // println!("{tree_height} {:?} -> {:?}", coords, tree_views);

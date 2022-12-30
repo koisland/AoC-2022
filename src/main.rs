@@ -25,7 +25,8 @@ fn main() {
     // let res = day6::read_comm_message(fname);
     // let res = day7::free_space_file_system(fname);
     // let res = day8::tree_scenic_scores(fname);
-    let res = day9::template(fname);
+    let res = day9::rope_movement(fname);
+
     if let Ok(out) = res {
         println!("{:#?}", out)
     } else {
