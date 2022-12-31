@@ -1,13 +1,12 @@
 use std::{
     collections::{VecDeque, HashSet},
     error::Error,
-    fmt::Display,
     fs,
     ops::{Add, AddAssign, Sub, Range},
     str::FromStr,
     vec, cmp,
 };
-
+use crate::days::error::ParserError;
 use itertools::Itertools;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
@@ -105,17 +104,7 @@ impl From<Direction> for Position {
     }
 }
 
-#[derive(Debug)]
-struct ParserError {
-    reason: String,
-}
 
-impl Display for ParserError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Unable to parse prompt. {}", self.reason)
-    }
-}
-impl Error for ParserError {}
 
 impl FromStr for Direction {
     type Err = ParserError;
