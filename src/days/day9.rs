@@ -1,13 +1,14 @@
-use std::{
-    collections::{VecDeque, HashSet},
-    error::Error,
-    fs,
-    ops::{Add, AddAssign, Sub, Range},
-    str::FromStr,
-    vec, cmp,
-};
 use crate::days::error::ParserError;
 use itertools::Itertools;
+use std::{
+    cmp,
+    collections::{HashSet, VecDeque},
+    error::Error,
+    fs,
+    ops::{Add, AddAssign, Range, Sub},
+    str::FromStr,
+    vec,
+};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 struct Position {
@@ -40,10 +41,10 @@ impl Position {
         let delta_y: u32 = (to.y - self.y).abs() as u32;
         return cmp::max(delta_x, delta_y);
     }
-    
+
     fn compute_tail_move(self, to: Position) -> Position {
         let mut delta_x = to.x - self.x;
-        let mut delta_y= to.y - self.y;
+        let mut delta_y = to.y - self.y;
         if (delta_x.abs() <= 2) && (delta_y.abs() <= 2) {
             delta_x = delta_x.clamp(-1, 1);
             delta_y = delta_y.clamp(-1, 1);
@@ -52,7 +53,10 @@ impl Position {
         } else if delta_x == 0 && delta_y.abs() == 2 {
             delta_y = delta_y.clamp(-1, 1);
         }
-        Position{ x: delta_x, y: delta_y }
+        Position {
+            x: delta_x,
+            y: delta_y,
+        }
     }
 }
 
@@ -103,8 +107,6 @@ impl From<Direction> for Position {
         }
     }
 }
-
-
 
 impl FromStr for Direction {
     type Err = ParserError;
@@ -163,25 +165,24 @@ impl Rope {
                         pos_changes.push(Position { x: 0, y: 0 })
                     }
 
-                //     let new_prev_segment_pos = *prev_segment + *prev_segment_change;
+                    //     let new_prev_segment_pos = *prev_segment + *prev_segment_change;
 
-                //     // If directly adjacent to previous segment.
-                //     if segment.is_adj(&new_prev_segment_pos) {
-                //         continue;
-                //         // pos_changes.push(Position { x: 0, y: 0 })
-                //     } else if !segment.is_adj(&new_prev_segment_pos)
-                //         && !segment.is_on_axis(&new_prev_segment_pos)
-                //     {
-                        
-                //     } else {
-                //         pos_changes.push(pos_change)
-                //     }
-                // }
+                    //     // If directly adjacent to previous segment.
+                    //     if segment.is_adj(&new_prev_segment_pos) {
+                    //         continue;
+                    //         // pos_changes.push(Position { x: 0, y: 0 })
+                    //     } else if !segment.is_adj(&new_prev_segment_pos)
+                    //         && !segment.is_on_axis(&new_prev_segment_pos)
+                    //     {
+
+                    //     } else {
+                    //         pos_changes.push(pos_change)
+                    //     }
+                    // }
                 }
             }
         }
         for (i, (curr_pos, pos_change)) in self.segments.iter_mut().zip(pos_changes).enumerate() {
-            
             *curr_pos += pos_change;
             println!("{i} Moved {:?} to {:?}", pos_change, curr_pos);
             self.moves.push(Move {
@@ -193,7 +194,7 @@ impl Rope {
     }
 
     /// Produce a grid showing the positions that a specific rope segment(s) visited.
-    /// 
+    ///
     /// **Warning**: Very memory expensive as will produce sparse grid.
     /// ```
     /// ..##..
@@ -224,7 +225,7 @@ impl Rope {
         // Fill empty spaces in grid. Fill in rope elements.
         for mv in self.moves.iter() {
             let (_, row) = (mv.pos.x as usize, mv.pos.y as usize);
-            
+
             let spec_row = grid.get_mut(row).unwrap();
             while spec_row.len() <= cols {
                 spec_row.push('.')
@@ -260,13 +261,26 @@ pub fn rope_movement(fname: &str) -> Result<usize, Box<dyn Error>> {
     }
     println!(
         "{:?}",
-        rope.moves.iter().filter_map(|mv|  if mv.segment == segment_len - 1 {Some(mv.pos)} else {None})
-        .collect_vec()
+        rope.moves
+            .iter()
+            .filter_map(|mv| if mv.segment == segment_len - 1 {
+                Some(mv.pos)
+            } else {
+                None
+            })
+            .collect_vec()
     );
     // Get the second element in rope (ie. the tail).
-    let uniq_tail_pos: HashSet<Position> = rope.moves
+    let uniq_tail_pos: HashSet<Position> = rope
+        .moves
         .iter()
-        .filter_map(|mv|  if mv.segment == segment_len - 1 {Some(mv.pos)} else {None})
+        .filter_map(|mv| {
+            if mv.segment == segment_len - 1 {
+                Some(mv.pos)
+            } else {
+                None
+            }
+        })
         .collect();
 
     // // // View grid.

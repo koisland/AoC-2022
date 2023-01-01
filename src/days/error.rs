@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 pub struct ParserError {
     pub reason: String,
