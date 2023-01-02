@@ -1,53 +1,7 @@
 use std::{error::Error, fs};
 
+use crate::days::common::GridString;
 use itertools::Itertools;
-
-struct GridString {
-    grid: String,
-    rows: usize,
-    cols: usize,
-}
-
-impl GridString {
-    fn new(grid: &str) -> Result<GridString, &'static str> {
-        let rows = grid.lines().collect_vec();
-        // Assuming all rows are equal length.
-        if let Some(n_cols) = rows.get(0).and_then(|row| Some(row.len())) {
-            Ok(GridString {
-                grid: rows.join(""),
-                rows: rows.len(),
-                cols: n_cols,
-            })
-        } else {
-            Err("Empty grid provided.")
-        }
-    }
-    fn get(&self, row: Option<usize>, col: Option<usize>) -> Option<Vec<char>> {
-        let query = self
-            .grid
-            .chars()
-            .enumerate()
-            .filter_map(|(i, elem)| {
-                if let (Some(r), Some(c)) = (row, col) {
-                    ((i / self.cols) == r && (i % self.cols) == c).then_some(elem)
-                } else if let Some(r) = row {
-                    (i / self.cols == r).then_some(elem)
-                } else if let Some(c) = col {
-                    (i % self.cols == c).then_some(elem)
-                } else {
-                    None
-                }
-            })
-            .collect_vec();
-
-        // Check if query empty so as to never return empty vec.
-        if !query.is_empty() {
-            Some(query)
-        } else {
-            None
-        }
-    }
-}
 
 pub fn tree_top_visibility(fname: &str) -> Result<usize, Box<dyn Error>> {
     let contents = fs::read_to_string(fname)?;

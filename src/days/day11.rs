@@ -217,7 +217,7 @@ impl Monkey {
 #[derive(Debug)]
 struct Barrel {
     monkeys: Vec<Rc<RefCell<Monkey>>>,
-    modulus_multiple: usize
+    modulus_multiple: usize,
 }
 
 impl Barrel {
@@ -232,7 +232,10 @@ impl Barrel {
         }
 
         // Calculate a multiple to use modular arithmetic on the worry level of an item so that the size of item remains manageable.
-        Ok(Barrel { monkeys, modulus_multiple: moduli.iter().product()})
+        Ok(Barrel {
+            monkeys,
+            modulus_multiple: moduli.iter().product(),
+        })
     }
     fn start_round(&mut self) {
         for monkey in self.monkeys.iter() {
@@ -252,7 +255,7 @@ impl Barrel {
                 //     * We reduce the size of the worry levels of items so our unsigned values don't overflow.
                 //     * See https://www.reddit.com/r/adventofcode/comments/zih7gf/2022_day_11_part_2_what_does_it_mean_find_another/j02eicp/.
                 let worry_lvl = new_item % self.modulus_multiple;
-                
+
                 let next_monkey_idx = if worry_lvl % monkey.throw_test.modulus == 0 {
                     monkey.throw_test.on_true
                 } else {
@@ -276,7 +279,8 @@ impl Barrel {
         for _ in 0..n_rounds {
             self.start_round();
         }
-        let n_inspected_items = self.monkeys
+        let n_inspected_items = self
+            .monkeys
             .iter()
             .map(|monkey| monkey.borrow().inspected_items)
             .sorted()

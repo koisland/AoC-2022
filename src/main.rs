@@ -13,7 +13,8 @@ mod days;
 // use crate::days::day8;
 // use crate::days::day9;
 // use crate::days::day10;
-use crate::days::day11;
+// use crate::days::day11;
+use crate::days::day12;
 
 fn main() {
     let args = env::args().collect_vec();
@@ -29,10 +30,11 @@ fn main() {
     // let res = day8::tree_scenic_scores(fname);
     // let res = day9::rope_movement(fname);
     // let res = day10::race_the_beam(fname);
-    let res = day11::monkey_business(fname);
+    // let res = day11::monkey_business(fname);
+    let res = day12::hill_climb(&fname);
 
     if let Ok(out) = res {
-        println!("{:#?}", out)
+        println!("{:?}", out.len())
     } else {
         panic!("{}", res.unwrap_err())
     }
