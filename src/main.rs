@@ -34,7 +34,7 @@ fn main() {
     let res = day12::hill_climb(&fname);
 
     if let Ok(out) = res {
-        println!("{:?}", out.len())
+        println!("{:?}", out)
     } else {
         panic!("{}", res.unwrap_err())
     }

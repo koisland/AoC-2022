@@ -34,7 +34,7 @@ impl Pos {
     
     fn successors(&self, grid: &GridString, alpha_map: &HashMap<char, usize>) -> Vec<(Pos, u32)> {
         let curr_height = Pos::map_coord_to_height(self.row, self.col, grid, alpha_map);
-        println!("({},{})", self.row, self.col);
+        // println!("({},{})", self.row, self.col);
         // Check bounds of adjaceny using Grid.
         let adjs = [
             (
@@ -61,13 +61,13 @@ impl Pos {
         .iter()
         .filter_map(|(row, col)| {
             let adj_height = Pos::map_coord_to_height(*row, *col, grid, alpha_map);
-            (curr_height <= adj_height + 1).then(|| (Pos {row: *row, col: *col}, 1))
+            (adj_height <= curr_height + 1).then(|| (Pos {row: *row, col: *col}, 1))
         })
         .collect()
     }
 }
 
-pub fn hill_climb(fname: &str) -> Result<Vec<(usize, usize)>, Box<dyn Error>> {
+pub fn hill_climb(fname: &str) -> Result<usize, Box<dyn Error>> {
     let contents = fs::read_to_string(fname)?;
     
     let mut grid = GridString::new(&contents)?;
@@ -89,12 +89,25 @@ pub fn hill_climb(fname: &str) -> Result<Vec<(usize, usize)>, Box<dyn Error>> {
     let start_node = Pos { row: start_pos.0, col: start_pos.1 };
     let stop_node = Pos { row: stop_pos.0, col: stop_pos.1 };
 
-    let result = astar(
+    let (path, n_steps) = astar(
         &start_node,
         |p| p.successors(&grid, &alphabet),
         |p| p.distance(&stop_node),
         |p| *p == stop_node
-    );
-    println!("{:?}", result);
-    Ok(vec![])
+    ).ok_or(ParserError {
+        reason: format!("No path found."),
+    })?;
+
+    Ok(n_steps as usize)
+}
+
+#[test]
+fn test_day12_1() {
+    let input = "data/test_day_12_1.txt";
+    let pathfinder = hill_climb(input);
+    if let Ok(n_steps) = pathfinder {
+        assert_eq!(n_steps, 31)
+    } else {
+        panic!("{}", pathfinder.unwrap_err())
+    }
 }
