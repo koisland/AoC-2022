@@ -32,7 +32,7 @@ impl Pos {
         *alpha_map.get(&curr_height_char).expect("Character not in alphabet.")
     }
     
-    fn successors(&self, grid: &GridString, alpha_map: &HashMap<char, usize>) -> Vec<(Pos, u32)> {
+    fn successors<F: Fn(usize, usize) -> bool>(&self, grid: &GridString, condition: F, alpha_map: &HashMap<char, usize>)-> Vec<(Pos, u32)> {
         let curr_height = Pos::map_coord_to_height(self.row, self.col, grid, alpha_map);
         // println!("({},{})", self.row, self.col);
         // Check bounds of adjaceny using Grid.
@@ -61,7 +61,7 @@ impl Pos {
         .iter()
         .filter_map(|(row, col)| {
             let adj_height = Pos::map_coord_to_height(*row, *col, grid, alpha_map);
-            (adj_height <= curr_height + 1).then(|| (Pos {row: *row, col: *col}, 1))
+            (condition(adj_height, curr_height)).then(|| (Pos {row: *row, col: *col}, 1))
         })
         .collect()
     }
@@ -91,7 +91,10 @@ pub fn hill_climb(fname: &str) -> Result<usize, Box<dyn Error>> {
 
     let (path, n_steps) = astar(
         &start_node,
-        |p| p.successors(&grid, &alphabet),
+        |p| p.successors(
+            &grid,
+            |adj, curr| adj <= curr + 1,
+            &alphabet),
         |p| p.distance(&stop_node),
         |p| *p == stop_node
     ).ok_or(ParserError {
@@ -101,12 +104,71 @@ pub fn hill_climb(fname: &str) -> Result<usize, Box<dyn Error>> {
     Ok(n_steps as usize)
 }
 
+pub fn hill_climb_any_start(fname: &str) -> Result<usize, Box<dyn Error>> {
+    let contents = fs::read_to_string(fname)?;
+    
+    let mut grid = GridString::new(&contents)?;
+    let alphabet = alphabet();
+
+    // Set starting and ending position elevation.
+    grid.grid = grid.grid.replace(ENDING_POS, "z").replace(STARTING_POS, "a");
+    
+    let (all_start_pos, stop_pos) = (
+        grid.search_all('a').ok_or(ParserError {
+            reason: format!("No starting position 'a'"),
+        })?,
+        grid.search('z').ok_or(ParserError {
+            reason: format!("No ending position 'z'"),
+        })?,
+    );
+
+    let mut all_paths_n_steps = vec![];
+    for start_pos in all_start_pos {
+        println!("Start: {:?}, End: {:?}", start_pos, stop_pos);
+        let start_node = Pos { row: start_pos.0, col: start_pos.1 };
+        let stop_node = Pos { row: stop_pos.0, col: stop_pos.1 };
+    
+        if let Some((_, n_steps)) = astar(
+            &start_node,
+            |p| p.successors(
+                &grid,
+                |adj, curr| adj <= curr + 1,
+                &alphabet),
+            |p| p.distance(&stop_node),
+            |p| *p == stop_node
+        ) {
+            all_paths_n_steps.push(n_steps)
+        } else {
+            continue;
+        }
+    };
+
+    println!("{:?}", all_paths_n_steps);
+    if let Some(least_n_steps) = all_paths_n_steps.iter().min() {
+        Ok(*least_n_steps as usize)
+    } else {
+        Err(Box::new(ParserError { reason: "No paths found.".to_string()}))
+    }
+    
+}
+
 #[test]
 fn test_day12_1() {
     let input = "data/test_day_12_1.txt";
     let pathfinder = hill_climb(input);
     if let Ok(n_steps) = pathfinder {
         assert_eq!(n_steps, 31)
+    } else {
+        panic!("{}", pathfinder.unwrap_err())
+    }
+}
+
+#[test]
+fn test_day12_2() {
+    let input = "data/test_day_12_1.txt";
+    let pathfinder = hill_climb_any_start(input);
+    if let Ok(n_steps) = pathfinder {
+        assert_eq!(n_steps, 29)
     } else {
         panic!("{}", pathfinder.unwrap_err())
     }

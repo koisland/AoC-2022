@@ -31,7 +31,7 @@ fn main() {
     // let res = day9::rope_movement(fname);
     // let res = day10::race_the_beam(fname);
     // let res = day11::monkey_business(fname);
-    let res = day12::hill_climb(&fname);
+    let res = day12::hill_climb_any_start(&fname);
 
     if let Ok(out) = res {
         println!("{:?}", out)
