@@ -30,7 +30,7 @@ impl GridString {
             None
         }
     }
-    pub fn fast_get(&self, row: usize, col: usize) -> Option<char> {
+    pub fn get_one(&self, row: usize, col: usize) -> Option<char> {
         self.grid.chars().nth(row * self.cols + col)
     }
     pub fn get(&self, row: Option<usize>, col: Option<usize>) -> Option<Vec<char>> {
