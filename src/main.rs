@@ -14,7 +14,8 @@ mod days;
 // use crate::days::day9;
 // use crate::days::day10;
 // use crate::days::day11;
-use crate::days::day12;
+// use crate::days::day12;
+use crate::days::day13;
 
 fn main() {
     let args = env::args().collect_vec();
@@ -31,7 +32,8 @@ fn main() {
     // let res = day9::rope_movement(fname);
     // let res = day10::race_the_beam(fname);
     // let res = day11::monkey_business(fname);
-    let res = day12::hill_climb_any_start(&fname);
+    // let res = day12::hill_climb_any_start(&fname);
+    let res = day13::distress_signal(&fname);
 
     if let Ok(out) = res {
         println!("{:?}", out)

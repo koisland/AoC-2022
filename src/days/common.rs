@@ -31,10 +31,17 @@ impl GridString {
         }
     }
     pub fn search_all(&self, elem: char) -> Option<Vec<(usize, usize)>> {
-        let matching_chars = self.grid
+        let matching_chars = self
+            .grid
             .chars()
             .enumerate()
-            .filter_map(|(idx, char)| if char == elem { Some((idx / self.cols, idx % self.cols))} else { None })
+            .filter_map(|(idx, char)| {
+                if char == elem {
+                    Some((idx / self.cols, idx % self.cols))
+                } else {
+                    None
+                }
+            })
             .collect_vec();
         if !matching_chars.is_empty() {
             Some(matching_chars)
